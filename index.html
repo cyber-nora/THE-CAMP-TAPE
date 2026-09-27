@@ -5,27 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>CAMP SOUNDSCAPE - NORA</title>
 <style>
-/* カラーテーマの変数定義 */
 :root {
-  --bg-color: #e6f4f1;          /* 朝：澄んだ青緑 */
-  --text-color: #0f2942;        /* 朝：深みのあるネイビー */
+  --bg-color: #e6f4f1;
+  --text-color: #0f2942;
   --panel-bg: rgba(255, 255, 255, 0.85);
   --border-color: rgba(15, 41, 66, 0.2);
   --player-blue: #2563eb;
 }
 
-/* 夜モードのカラーオーバーライド */
 body.mode-yoru {
-  --bg-color: #0f172a;          /* 夜：ディープブルー */
-  --text-color: #f8fafc;        /* 夜：くっきり見える白文字 */
+  --bg-color: #0f172a;
+  --text-color: #f8fafc;
   --panel-bg: rgba(30, 41, 59, 0.85);
   --border-color: rgba(255, 255, 255, 0.2);
 }
 
-/* 昼モードのカラーオーバーライド */
 body.mode-hiru {
-  --bg-color: #fef9e7;          /* 昼：温かいイエロー */
-  --text-color: #2c221e;        /* 昼：落ち着いたブラウン */
+  --bg-color: #fef9e7;
+  --text-color: #2c221e;
   --panel-bg: rgba(255, 255, 255, 0.88);
   --border-color: rgba(44, 34, 30, 0.2);
 }
@@ -46,12 +43,11 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 24px;
+  padding: 24px;
   position: relative;
   transition: background-color 0.5s ease, color 0.5s ease;
 }
 
-/* 1. 左上：ブランドロゴ ＋ キャッチコピー（枠線なし） */
 .brand-header {
   position: absolute;
   top: 24px;
@@ -77,7 +73,6 @@ body {
   white-space: nowrap;
 }
 
-/* 2. 中央上：タイトルロゴ */
 .title-logo-container {
   width: 100%;
   display: flex;
@@ -96,7 +91,6 @@ body {
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.1));
 }
 
-/* 右下：noraの手書きシグネチャー */
 .signature {
   position: absolute;
   bottom: 24px;
@@ -112,7 +106,6 @@ body {
   opacity: 0.85;
 }
 
-/* メインフレーム（左右並び） */
 .workspace {
   display: flex;
   flex-wrap: wrap;
@@ -124,7 +117,6 @@ body {
   margin: 10px 0;
 }
 
-/* 左側：メインスタンプ画像 */
 .stamp-container {
   width: 280px;
   height: 280px;
@@ -140,7 +132,6 @@ body {
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-/* 右側：プレーヤー ＋ カセット選択 */
 .control-side {
   display: flex;
   flex-direction: column;
@@ -148,7 +139,6 @@ body {
   gap: 20px;
 }
 
-/* --- HTML/CSS製 カセットプレーヤー --- */
 .css-player {
   width: 200px;
   height: 290px;
@@ -164,7 +154,6 @@ body {
   transition: border-color 0.5s ease;
 }
 
-/* ヘッドフォンジャックノブ */
 .css-player::before {
   content: '';
   position: absolute;
@@ -176,7 +165,6 @@ body {
   border-radius: 3px 3px 0 0;
 }
 
-/* プレーヤー上部：レトロ青色パネル */
 .player-top-panel {
   width: 100%;
   height: 60px;
@@ -190,7 +178,6 @@ body {
   gap: 4px;
 }
 
-/* サウンドメーター（レベルメーター） */
 .vu-meter {
   display: flex;
   gap: 4px;
@@ -227,7 +214,6 @@ body {
   100% { height: 95%; }
 }
 
-/* カセット小窓（透明ウィンドウ） */
 .cassette-window {
   width: 100%;
   height: 110px;
@@ -242,7 +228,6 @@ body {
   overflow: hidden;
 }
 
-/* くるくる回るテープリール */
 .reel {
   width: 42px;
   height: 42px;
@@ -255,23 +240,14 @@ body {
   justify-content: center;
 }
 
-.reel::after {
+.reel::after, .reel::before {
   content: '';
   position: absolute;
-  width: 100%;
-  height: 3px;
   background: #e2e8f0;
 }
+.reel::after { width: 100%; height: 3px; }
+.reel::before { height: 100%; width: 3px; }
 
-.reel::before {
-  content: '';
-  position: absolute;
-  height: 100%;
-  width: 3px;
-  background: #e2e8f0;
-}
-
-/* 再生中の回転アニメーション */
 .is-playing .reel {
   animation: spin 1.8s linear infinite;
 }
@@ -281,7 +257,6 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-/* テープの中央ブリッジ */
 .tape-bridge {
   position: absolute;
   bottom: 12px;
@@ -291,7 +266,6 @@ body {
   border-radius: 2px;
 }
 
-/* PLAY / STOP ボタン */
 .play-btn {
   margin-top: 16px;
   padding: 8px 24px;
@@ -311,7 +285,6 @@ body {
   transform: scale(0.95);
 }
 
-/* カセットテープ切替ラック */
 .cassette-rack {
   display: flex;
   gap: 8px;
@@ -341,7 +314,6 @@ body.mode-yoru .cassette-btn.active {
   border-color: #f8fafc;
 }
 
-/* 下部合奏SEトレイ */
 .se-tray {
   display: flex;
   gap: 10px;
@@ -399,24 +371,20 @@ body.mode-yoru .se-button.active {
 </head>
 <body class="mode-asa">
 
-<!-- 左上：枠線なしロゴ ＋ キャッチコピー -->
 <div class="brand-header">
-  <img src="logo.png" class="brand-logo" alt="nora">
+  <img src="images/logo.png" class="brand-logo" alt="nora">
   <div class="copy">音は、時代を旅する。</div>
 </div>
 
-<!-- 中央上：タイトルロゴ -->
 <div class="title-logo-container">
-  <img src="title-logo.png" class="title-logo" alt="THE CAMP TAPE">
+  <img src="images/title-logo.png" class="title-logo" alt="THE CAMP TAPE">
 </div>
 
 <div class="workspace">
-  <!-- 左側：メインスタンプ画像 -->
   <div class="stamp-container">
-    <img src="asa.png" id="stampImg" class="stamp-img" alt="Camp Scene">
+    <img src="images/bg-morning.png" id="stampImg" class="stamp-img" alt="Camp Scene">
   </div>
 
-  <!-- 右側：カセットプレーヤー ＋ テープ選択 -->
   <div class="control-side">
     <div class="css-player" id="player">
       <div class="player-top-panel">
@@ -429,7 +397,6 @@ body.mode-yoru .se-button.active {
         </div>
       </div>
 
-      <!-- テープ回転ウィンドウ -->
       <div class="cassette-window">
         <div class="reel"></div>
         <div class="reel"></div>
@@ -439,27 +406,24 @@ body.mode-yoru .se-button.active {
       <button class="play-btn" id="playBtn">PLAY</button>
     </div>
 
-    <!-- 時間帯（カセット）切り替えボタン -->
     <div class="cassette-rack">
-      <button class="cassette-btn active" data-mode="asa" data-img="asa.png">Morning</button>
-      <button class="cassette-btn" data-mode="hiru" data-img="hiru.png">Midday</button>
-      <button class="cassette-btn" data-mode="yoru" data-img="yoru.png">Night</button>
+      <button class="cassette-btn active" data-mode="asa" data-img="images/bg-morning.png" data-sound="sounds/tape-morning.mp3">Morning</button>
+      <button class="cassette-btn" data-mode="hiru" data-img="images/bg-midday.png" data-sound="sounds/tape-midday.mp3">Midday</button>
+      <button class="cassette-btn" data-mode="yoru" data-img="images/bg-night.png" data-sound="sounds/tape-night.mp3">Night</button>
     </div>
   </div>
 </div>
 
-<!-- 下部：SEトレイ -->
 <div class="se-tray">
-  <div class="se-button" data-sound="bonfire"><span class="icon">🔥</span><span class="label">焚き火</span></div>
-  <div class="se-button" data-sound="sauna"><span class="icon">🪨</span><span class="label">サウナ</span></div>
-  <div class="se-button" data-sound="river"><span class="icon">🌊</span><span class="label">川</span></div>
-  <div class="se-button" data-sound="cooking"><span class="icon">🍳</span><span class="label">料理</span></div>
-  <div class="se-button" data-sound="onsen"><span class="icon">♨️</span><span class="label">温泉</span></div>
+  <div class="se-button" data-sound="sounds/se-bonfire.mp3"><span class="icon">🔥</span><span class="label">焚き火</span></div>
+  <div class="se-button" data-sound="sounds/se-sauna.mp3"><span class="icon">🪨</span><span class="label">サウナ</span></div>
+  <div class="se-button" data-sound="sounds/se-river.mp3"><span class="icon">🌊</span><span class="label">川</span></div>
+  <div class="se-button" data-sound="sounds/se-cooking.mp3"><span class="icon">🍳</span><span class="label">料理</span></div>
+  <div class="se-button" data-sound="sounds/se-onsen.mp3"><span class="icon">♨️</span><span class="label">温泉</span></div>
 </div>
 
-<!-- 右下：手書き風ロゴシグネチャー -->
 <div class="signature">
-  <img src="nora-1.png" class="signature-logo" alt="Nora Signature">
+  <img src="images/nora-1.png" class="signature-logo" alt="Nora Signature">
 </div>
 
 <script>
@@ -470,6 +434,17 @@ const cassetteBtns = document.querySelectorAll('.cassette-btn');
 const seButtons = document.querySelectorAll('.se-button');
 
 let isPlaying = false;
+let currentMainAudio = new Audio('sounds/tape-morning.mp3');
+currentMainAudio.loop = true;
+
+const seAudioMap = {};
+
+seButtons.forEach(btn => {
+  const soundSrc = btn.dataset.sound;
+  const audio = new Audio(soundSrc);
+  audio.loop = true;
+  seAudioMap[soundSrc] = audio;
+});
 
 // PLAY / STOP トグル
 playBtn.addEventListener('click', () => {
@@ -478,14 +453,26 @@ playBtn.addEventListener('click', () => {
     player.classList.add('is-playing');
     playBtn.textContent = 'STOP';
     playBtn.style.background = '#e11d48';
+
+    currentMainAudio.play();
+
+    seButtons.forEach(btn => {
+      if (btn.classList.contains('active')) {
+        const soundSrc = btn.dataset.sound;
+        seAudioMap[soundSrc].play();
+      }
+    });
   } else {
     player.classList.remove('is-playing');
     playBtn.textContent = 'PLAY';
     playBtn.style.background = '#0f172a';
+
+    currentMainAudio.pause();
+    Object.values(seAudioMap).forEach(audio => audio.pause());
   }
 });
 
-// 朝・昼・夜のモード切り替え
+// 時間帯（メインテープ）切り替え
 cassetteBtns.forEach(btn => {
   btn.addEventListener('click', () => {
     cassetteBtns.forEach(b => b.classList.remove('active'));
@@ -499,13 +486,38 @@ cassetteBtns.forEach(btn => {
       stampImg.src = btn.dataset.img;
       stampImg.style.opacity = '1';
     }, 200);
+
+    const soundSrc = btn.dataset.sound;
+    const wasPlaying = isPlaying;
+
+    if (wasPlaying) {
+      currentMainAudio.pause();
+    }
+    
+    currentMainAudio = new Audio(soundSrc);
+    currentMainAudio.loop = true;
+
+    if (wasPlaying) {
+      currentMainAudio.play();
+    }
   });
 });
 
-// SEノード選択
+// SEトレイ トグル
 seButtons.forEach(btn => {
   btn.addEventListener('click', () => {
     btn.classList.toggle('active');
+    const soundSrc = btn.dataset.sound;
+    const audio = seAudioMap[soundSrc];
+
+    if (isPlaying) {
+      if (btn.classList.contains('active')) {
+        audio.play();
+      } else {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    }
   });
 });
 </script>
