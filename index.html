@@ -91,12 +91,14 @@ body {
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.1));
 }
 
+/* 右下：手書き風ロゴシグネチャー */
 .signature {
   position: absolute;
   bottom: 24px;
   right: 28px;
   display: flex;
   align-items: center;
+  z-index: 10;
 }
 
 .signature-logo {
@@ -104,6 +106,13 @@ body {
   width: auto;
   object-fit: contain;
   opacity: 0.85;
+  transition: filter 0.5s ease, opacity 0.5s ease;
+}
+
+/* 夜モード：黒文字の画像を反転させて白くする */
+body.mode-yoru .signature-logo {
+  filter: invert(1);
+  opacity: 0.9;
 }
 
 .workspace {
