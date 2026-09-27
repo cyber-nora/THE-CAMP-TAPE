@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CAMP SOUNDSCAPE - NORA</title>
+<style>
+/* カラーテーマの変数定義 */
+:root {
+  --bg-color: #e6f4f1;          /* 朝：澄んだ青緑 */
+  --text-color: #0f2942;        /* 朝：深みのあるネイビー */
+  --panel-bg: rgba(255, 255, 255, 0.85);
+  --border-color: rgba(15, 41, 66, 0.2);
+  --player-blue: #2563eb;
+}
+
+/* 夜モードのカラーオーバーライド */
+body.mode-yoru {
+  --bg-color: #0f172a;          /* 夜：ディープブルー */
+  --text-color: #f8fafc;        /* 夜：くっきり見える白文字 */
+  --panel-bg: rgba(30, 41, 59, 0.85);
+  --border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* 昼モードのカラーオーバーライド */
+body.mode-hiru {
+  --bg-color: #fef9e7;          /* 昼：温かいイエロー */
+  --text-color: #2c221e;        /* 昼：落ち着いたブラウン */
+  --panel-bg: rgba(255, 255, 255, 0.88);
+  --border-color: rgba(44, 34, 30, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 24px;
+  position: relative;
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* 1. 左上：ブランドロゴ ＋ キャッチコピー（枠線なし） */
+.brand-header {
+  position: absolute;
+  top: 24px;
+  left: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  z-index: 10;
+}
+
+.brand-logo {
+  height: 24px;
+  width: auto;
+  object-fit: contain;
+}
+
+.copy {
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  font-weight: 400;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
+/* 2. 中央上：タイトルロゴ */
+.title-logo-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  z-index: 5;
+}
+
+.title-logo {
+  max-width: 320px;
+  width: 70%;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.1));
+}
+
+/* 右下：noraの手書きシグネチャー */
+.signature {
+  position: absolute;
+  bottom: 24px;
+  right: 28px;
+  display: flex;
+  align-items: center;
+}
+
+.signature-logo {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+  opacity: 0.85;
+}
+
+/* メインフレーム（左右並び） */
+.workspace {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  width: 100%;
+  max-width: 800px;
+  margin: 10px 0;
+}
+
+/* 左側：メインスタンプ画像 */
+.stamp-container {
+  width: 280px;
+  height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stamp-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* 右側：プレーヤー ＋ カセット選択 */
+.control-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* --- HTML/CSS製 カセットプレーヤー --- */
+.css-player {
+  width: 200px;
+  height: 290px;
+  background: linear-gradient(145deg, rgba(226, 232, 240, 0.9), rgba(203, 213, 225, 0.9));
+  border: 3px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  position: relative;
+  transition: border-color 0.5s ease;
+}
+
+/* ヘッドフォンジャックノブ */
+.css-player::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 30px;
+  width: 16px;
+  height: 10px;
+  background: #64748b;
+  border-radius: 3px 3px 0 0;
+}
+
+/* プレーヤー上部：レトロ青色パネル */
+.player-top-panel {
+  width: 100%;
+  height: 60px;
+  background: var(--player-blue);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* サウンドメーター（レベルメーター） */
+.vu-meter {
+  display: flex;
+  gap: 4px;
+  align-items: flex-end;
+  height: 22px;
+  padding: 3px 8px;
+  background: rgba(15, 23, 42, 0.85);
+  border-radius: 4px;
+}
+
+.vu-bar {
+  width: 4px;
+  height: 20%;
+  background: #4ade80;
+  border-radius: 1px;
+}
+
+.vu-bar:nth-child(4), .vu-bar:nth-child(5) {
+  background: #facc15;
+}
+
+.is-playing .vu-bar {
+  animation: jump 0.35s infinite alternate ease-in-out;
+}
+
+.is-playing .vu-bar:nth-child(1) { animation-delay: 0.1s; }
+.is-playing .vu-bar:nth-child(2) { animation-delay: 0.25s; }
+.is-playing .vu-bar:nth-child(3) { animation-delay: 0.0s; }
+.is-playing .vu-bar:nth-child(4) { animation-delay: 0.15s; }
+.is-playing .vu-bar:nth-child(5) { animation-delay: 0.3s; }
+
+@keyframes jump {
+  0% { height: 15%; }
+  100% { height: 95%; }
+}
+
+/* カセット小窓（透明ウィンドウ） */
+.cassette-window {
+  width: 100%;
+  height: 110px;
+  background: #0f172a;
+  border: 2px solid #64748b;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* くるくる回るテープリール */
+.reel {
+  width: 42px;
+  height: 42px;
+  border: 3px solid #e2e8f0;
+  border-radius: 50%;
+  background: radial-gradient(circle, #334155 30%, #0f172a 31%);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reel::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 3px;
+  background: #e2e8f0;
+}
+
+.reel::before {
+  content: '';
+  position: absolute;
+  height: 100%;
+  width: 3px;
+  background: #e2e8f0;
+}
+
+/* 再生中の回転アニメーション */
+.is-playing .reel {
+  animation: spin 1.8s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* テープの中央ブリッジ */
+.tape-bridge {
+  position: absolute;
+  bottom: 12px;
+  width: 120px;
+  height: 14px;
+  background: #475569;
+  border-radius: 2px;
+}
+
+/* PLAY / STOP ボタン */
+.play-btn {
+  margin-top: 16px;
+  padding: 8px 24px;
+  background: #0f172a;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: all 0.2s ease;
+}
+
+.play-btn:active {
+  transform: scale(0.95);
+}
+
+/* カセットテープ切替ラック */
+.cassette-rack {
+  display: flex;
+  gap: 8px;
+}
+
+.cassette-btn {
+  padding: 6px 14px;
+  background: var(--panel-bg);
+  color: var(--text-color);
+  border: 1.5px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cassette-btn.active {
+  background: #0f172a;
+  color: #fff;
+  border-color: #0f172a;
+}
+
+body.mode-yoru .cassette-btn.active {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #f8fafc;
+}
+
+/* 下部合奏SEトレイ */
+.se-tray {
+  display: flex;
+  gap: 10px;
+  max-width: 500px;
+  width: 100%;
+  justify-content: center;
+  background: var(--panel-bg);
+  padding: 12px 16px;
+  border-radius: 32px;
+  border: 1.5px solid var(--border-color);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  margin-top: 16px;
+  transition: all 0.5s ease;
+}
+
+.se-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 52px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.se-button.active {
+  background: #0f172a;
+  color: #fff;
+  border-color: #0f172a;
+}
+
+body.mode-yoru .se-button.active {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #f8fafc;
+}
+
+.se-button .icon { font-size: 16px; }
+.se-button .label { font-size: 9px; margin-top: 3px; letter-spacing: 0.05em; }
+
+@media (max-width: 600px) {
+  .brand-header { top: 16px; left: 16px; }
+  .signature { bottom: 16px; right: 16px; }
+  .brand-logo { height: 20px; }
+  .signature-logo { height: 26px; }
+  .title-logo-container { margin-top: 60px; }
+  .title-logo { max-width: 240px; }
+}
+</style>
+</head>
+<body class="mode-asa">
+
+<!-- 左上：枠線なしロゴ ＋ キャッチコピー -->
+<div class="brand-header">
+  <img src="logo.png" class="brand-logo" alt="nora">
+  <div class="copy">音は、時代を旅する。</div>
+</div>
+
+<!-- 中央上：タイトルロゴ -->
+<div class="title-logo-container">
+  <img src="title-logo.png" class="title-logo" alt="THE CAMP TAPE">
+</div>
+
+<div class="workspace">
+  <!-- 左側：メインスタンプ画像 -->
+  <div class="stamp-container">
+    <img src="asa.png" id="stampImg" class="stamp-img" alt="Camp Scene">
+  </div>
+
+  <!-- 右側：カセットプレーヤー ＋ テープ選択 -->
+  <div class="control-side">
+    <div class="css-player" id="player">
+      <div class="player-top-panel">
+        <div class="vu-meter">
+          <div class="vu-bar"></div>
+          <div class="vu-bar"></div>
+          <div class="vu-bar"></div>
+          <div class="vu-bar"></div>
+          <div class="vu-bar"></div>
+        </div>
+      </div>
+
+      <!-- テープ回転ウィンドウ -->
+      <div class="cassette-window">
+        <div class="reel"></div>
+        <div class="reel"></div>
+        <div class="tape-bridge"></div>
+      </div>
+
+      <button class="play-btn" id="playBtn">PLAY</button>
+    </div>
+
+    <!-- 時間帯（カセット）切り替えボタン -->
+    <div class="cassette-rack">
+      <button class="cassette-btn active" data-mode="asa" data-img="asa.png">Morning</button>
+      <button class="cassette-btn" data-mode="hiru" data-img="hiru.png">Midday</button>
+      <button class="cassette-btn" data-mode="yoru" data-img="yoru.png">Night</button>
+    </div>
+  </div>
+</div>
+
+<!-- 下部：SEトレイ -->
+<div class="se-tray">
+  <div class="se-button" data-sound="bonfire"><span class="icon">🔥</span><span class="label">焚き火</span></div>
+  <div class="se-button" data-sound="sauna"><span class="icon">🪨</span><span class="label">サウナ</span></div>
+  <div class="se-button" data-sound="river"><span class="icon">🌊</span><span class="label">川</span></div>
+  <div class="se-button" data-sound="cooking"><span class="icon">🍳</span><span class="label">料理</span></div>
+  <div class="se-button" data-sound="onsen"><span class="icon">♨️</span><span class="label">温泉</span></div>
+</div>
+
+<!-- 右下：手書き風ロゴシグネチャー -->
+<div class="signature">
+  <img src="nora-1.png" class="signature-logo" alt="Nora Signature">
+</div>
+
+<script>
+const player = document.getElementById('player');
+const playBtn = document.getElementById('playBtn');
+const stampImg = document.getElementById('stampImg');
+const cassetteBtns = document.querySelectorAll('.cassette-btn');
+const seButtons = document.querySelectorAll('.se-button');
+
+let isPlaying = false;
+
+// PLAY / STOP トグル
+playBtn.addEventListener('click', () => {
+  isPlaying = !isPlaying;
+  if (isPlaying) {
+    player.classList.add('is-playing');
+    playBtn.textContent = 'STOP';
+    playBtn.style.background = '#e11d48';
+  } else {
+    player.classList.remove('is-playing');
+    playBtn.textContent = 'PLAY';
+    playBtn.style.background = '#0f172a';
+  }
+});
+
+// 朝・昼・夜のモード切り替え
+cassetteBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    cassetteBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const mode = btn.dataset.mode;
+    document.body.className = `mode-${mode}`;
+
+    stampImg.style.opacity = '0';
+    setTimeout(() => {
+      stampImg.src = btn.dataset.img;
+      stampImg.style.opacity = '1';
+    }, 200);
+  });
+});
+
+// SEノード選択
+seButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    btn.classList.toggle('active');
+  });
+});
+</script>
+</body>
+</html>
