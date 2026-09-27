@@ -469,22 +469,27 @@ body.mode-yoru .signature-logo {
 <!-- 右側コンセプト・2026・シグネチャーブロック -->
 <div class="right-sidebar">
   <p class="concept-text">
-  お気に入りの音楽を、<br> 
-  カセットテープに吹き込み、<br>
-  キャンプに行く。<br><br>
+    お気に入りの音楽を、<br>
+    カセットテープに吹き込み、<br>
+    キャンプに行く。<br><br>
 
-  朝、昼、夜。<br>
-  それぞれの時間に流れる音楽と、<br>
-  その場所で生まれる自然の音。<br><br>
+    朝、昼、夜。<br>
+    それぞれの時間に流れる音楽と、<br>
+    その場所で生まれる自然の音。<br><br>
 
-  音楽と自然が重なり合う。<br>
-  その瞬間、新しい音楽が生まれる。
-</p>
+    音楽と自然が重なり合う。<br>
+    その瞬間、新しい音楽が生まれる。
+  </p>
   <div class="year-text">THE CAMP TAPE<br>2026</div>
   <img src="images/nora-1.png" class="signature-logo" alt="Nora Signature">
 </div>
 
 <script>
+// --- 音響ミキシング設定（単位: 0.0 ~ 1.0） ---
+const VOL_MAIN = 0.8;      // メイン音源（テープ）の基本音量
+const VOL_SE = 0.35;       // SEの基本音量（音楽に自然になじむバランス）
+const FADE_TIME = 800;     // フェードイン/アウト時間（ミリ秒）
+
 const player = document.getElementById('player');
 const playBtn = document.getElementById('playBtn');
 const stampImg = document.getElementById('stampImg');
@@ -494,49 +499,95 @@ const seButtons = document.querySelectorAll('.se-button');
 let isPlaying = false;
 let currentMainAudio = new Audio('sounds/tape-morning.mp3');
 currentMainAudio.loop = true;
+currentMainAudio.volume = VOL_MAIN;
 
 const seAudioMap = {};
 
+// SE音源の初期化と音量設定
 seButtons.forEach(btn => {
   const soundSrc = btn.dataset.sound;
   const audio = new Audio(soundSrc);
   audio.loop = true;
+  audio.volume = 0; // 初期音量は0
   seAudioMap[soundSrc] = audio;
 });
 
+// スムーズな音量フェード処理関数
+function fadeAudio(audio, targetVolume, duration, onComplete) {
+  const startVolume = audio.volume;
+  const startTime = performance.now();
+
+  function update() {
+    const elapsed = performance.now() - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    audio.volume = startVolume + (targetVolume - startVolume) * progress;
+
+    if (progress < 1) {
+      requestAnimationFrame(update);
+    } else if (onComplete) {
+      onComplete();
+    }
+  }
+  requestAnimationFrame(update);
+}
+
+// PLAY / STOP ボタンの挙動
 playBtn.addEventListener('click', () => {
   isPlaying = !isPlaying;
+
   if (isPlaying) {
     player.classList.add('is-playing');
     playBtn.textContent = 'STOP';
     playBtn.style.background = '#e11d48';
 
+    // メイン音源のフェードイン再生
+    currentMainAudio.volume = 0;
     currentMainAudio.play();
+    fadeAudio(currentMainAudio, VOL_MAIN, FADE_TIME);
 
+    // 選択されているSEのフェードイン再生
     seButtons.forEach(btn => {
       if (btn.classList.contains('active')) {
         const soundSrc = btn.dataset.sound;
-        seAudioMap[soundSrc].play();
+        const audio = seAudioMap[soundSrc];
+        audio.volume = 0;
+        audio.play();
+        fadeAudio(audio, VOL_SE, FADE_TIME);
       }
     });
+
   } else {
     player.classList.remove('is-playing');
     playBtn.textContent = 'PLAY';
     playBtn.style.background = '#0f172a';
 
-    currentMainAudio.pause();
-    Object.values(seAudioMap).forEach(audio => audio.pause());
+    // 全音源のフェードアウト停止
+    fadeAudio(currentMainAudio, 0, FADE_TIME, () => {
+      currentMainAudio.pause();
+    });
+
+    Object.values(seAudioMap).forEach(audio => {
+      if (!audio.paused) {
+        fadeAudio(audio, 0, FADE_TIME, () => {
+          audio.pause();
+        });
+      }
+    });
   }
 });
 
+// カセット切り替え（クロスフェード処理）
 cassetteBtns.forEach(btn => {
   btn.addEventListener('click', () => {
+    if (btn.classList.contains('active')) return;
+
     cassetteBtns.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
 
     const mode = btn.dataset.mode;
     document.body.className = `mode-${mode}`;
 
+    // ビジュアル切替
     stampImg.style.opacity = '0';
     setTimeout(() => {
       stampImg.src = btn.dataset.img;
@@ -544,21 +595,27 @@ cassetteBtns.forEach(btn => {
     }, 200);
 
     const soundSrc = btn.dataset.sound;
-    const wasPlaying = isPlaying;
+    const oldAudio = currentMainAudio;
 
-    if (wasPlaying) {
-      currentMainAudio.pause();
-    }
-    
+    // 新音源のセット
     currentMainAudio = new Audio(soundSrc);
     currentMainAudio.loop = true;
 
-    if (wasPlaying) {
+    if (isPlaying) {
+      // 旧音源をフェードアウト停止
+      fadeAudio(oldAudio, 0, FADE_TIME, () => oldAudio.pause());
+
+      // 新音源をフェードイン再生
+      currentMainAudio.volume = 0;
       currentMainAudio.play();
+      fadeAudio(currentMainAudio, VOL_MAIN, FADE_TIME);
+    } else {
+      currentMainAudio.volume = VOL_MAIN;
     }
   });
 });
 
+// SEトレイのボタン切替
 seButtons.forEach(btn => {
   btn.addEventListener('click', () => {
     btn.classList.toggle('active');
@@ -567,10 +624,13 @@ seButtons.forEach(btn => {
 
     if (isPlaying) {
       if (btn.classList.contains('active')) {
+        audio.volume = 0;
         audio.play();
+        fadeAudio(audio, VOL_SE, FADE_TIME);
       } else {
-        audio.pause();
-        audio.currentTime = 0;
+        fadeAudio(audio, 0, FADE_TIME, () => {
+          audio.pause();
+        });
       }
     }
   });
