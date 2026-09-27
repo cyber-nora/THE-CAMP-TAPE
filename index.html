@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>CAMP SOUNDSCAPE - NORA</title>
+<title>THE CAMP TAPE - NORA</title>
 <style>
 :root {
   --bg-color: #e6f4f1;
@@ -46,8 +46,10 @@ body {
   padding: 24px;
   position: relative;
   transition: background-color 0.5s ease, color 0.5s ease;
+  overflow-x: hidden;
 }
 
+/* 左上：ブランドヘッダー */
 .brand-header {
   position: absolute;
   top: 24px;
@@ -73,6 +75,7 @@ body {
   white-space: nowrap;
 }
 
+/* 中央：タイトルロゴ */
 .title-logo-container {
   width: 100%;
   display: flex;
@@ -91,30 +94,7 @@ body {
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.1));
 }
 
-/* 右下：手書き風ロゴシグネチャー */
-.signature {
-  position: absolute;
-  bottom: 24px;
-  right: 28px;
-  display: flex;
-  align-items: center;
-  z-index: 10;
-}
-
-.signature-logo {
-  height: 32px;
-  width: auto;
-  object-fit: contain;
-  opacity: 0.85;
-  transition: filter 0.5s ease, opacity 0.5s ease;
-}
-
-/* 夜モード：黒文字の画像を反転させて白くする */
-body.mode-yoru .signature-logo {
-  filter: invert(1);
-  opacity: 0.9;
-}
-
+/* メインワークスペース */
 .workspace {
   display: flex;
   flex-wrap: wrap;
@@ -148,6 +128,7 @@ body.mode-yoru .signature-logo {
   gap: 20px;
 }
 
+/* カセットプレーヤー */
 .css-player {
   width: 200px;
   height: 290px;
@@ -323,6 +304,7 @@ body.mode-yoru .cassette-btn.active {
   border-color: #f8fafc;
 }
 
+/* 下部：SEトレイ */
 .se-tray {
   display: flex;
   gap: 10px;
@@ -368,11 +350,64 @@ body.mode-yoru .se-button.active {
 .se-button .icon { font-size: 16px; }
 .se-button .label { font-size: 9px; margin-top: 3px; letter-spacing: 0.05em; }
 
+/* 右側：コンセプト ＋ 2026 ＋ シグネチャー エリア */
+.right-sidebar {
+  position: absolute;
+  right: 28px;
+  bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  max-width: 220px;
+  text-align: right;
+  z-index: 10;
+}
+
+.concept-text {
+  font-size: 0.75rem;
+  line-height: 1.6;
+  letter-spacing: 0.08em;
+  opacity: 0.8;
+  font-weight: 300;
+}
+
+.year-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  opacity: 0.75;
+}
+
+.signature-logo {
+  height: 28px;
+  width: auto;
+  object-fit: contain;
+  opacity: 0.85;
+  transition: filter 0.5s ease, opacity 0.5s ease;
+}
+
+/* 夜モード：黒ロゴの反転 */
+body.mode-yoru .signature-logo {
+  filter: invert(1);
+  opacity: 0.9;
+}
+
+@media (max-width: 900px) {
+  .right-sidebar {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    align-items: center;
+    text-align: center;
+    margin-top: 32px;
+    max-width: 100%;
+  }
+}
+
 @media (max-width: 600px) {
   .brand-header { top: 16px; left: 16px; }
-  .signature { bottom: 16px; right: 16px; }
   .brand-logo { height: 20px; }
-  .signature-logo { height: 26px; }
   .title-logo-container { margin-top: 60px; }
   .title-logo { max-width: 240px; }
 }
@@ -431,7 +466,15 @@ body.mode-yoru .se-button.active {
   <div class="se-button" data-sound="sounds/se-onsen.mp3"><span class="icon">♨️</span><span class="label">温泉</span></div>
 </div>
 
-<div class="signature">
+<!-- 右側コンセプト・2026・シグネチャーブロック -->
+<div class="right-sidebar">
+  <p class="concept-text">
+    山の中で過ごす時間、<br>
+    移り変わる空気と音風景。<br>
+    カセットテープに閉じ込めた<br>
+    私的キャンプ・サウンドスケープ。
+  </p>
+  <div class="year-text">2026</div>
   <img src="images/nora-1.png" class="signature-logo" alt="Nora Signature">
 </div>
 
@@ -455,7 +498,6 @@ seButtons.forEach(btn => {
   seAudioMap[soundSrc] = audio;
 });
 
-// PLAY / STOP トグル
 playBtn.addEventListener('click', () => {
   isPlaying = !isPlaying;
   if (isPlaying) {
@@ -481,7 +523,6 @@ playBtn.addEventListener('click', () => {
   }
 });
 
-// 時間帯（メインテープ）切り替え
 cassetteBtns.forEach(btn => {
   btn.addEventListener('click', () => {
     cassetteBtns.forEach(b => b.classList.remove('active'));
@@ -512,7 +553,6 @@ cassetteBtns.forEach(btn => {
   });
 });
 
-// SEトレイ トグル
 seButtons.forEach(btn => {
   btn.addEventListener('click', () => {
     btn.classList.toggle('active');
